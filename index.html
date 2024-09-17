@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Tegola Sample</title>
+    <script src="https://cdn.jsdelivr.net/npm/ol@v10.1.0/dist/ol.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/ol@v10.1.0/ol.css"
+    />
+    <style>
+      #map {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: #f8f4f0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      const host = "http://localhost";
+      const port = "8081";
+      new ol.Map({
+        layers: [
+          new ol.layer.VectorTile({
+            source: new ol.source.VectorTile({
+              attributions:
+                '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+              format: new ol.format.MVT(),
+              tileGrid: ol.tilegrid.createXYZ({ maxZoom: 20 }),
+              tilePixelRatio: 16,
+              url: `${host}:${port}/maps/world/{z}/{x}/{y}.vector.pbf`,
+            }),
+            style: [
+              new ol.style.Style({
+                fill: new ol.style.Fill({
+                  color: [224, 201, 166, 0.5],
+                }),
+                stroke: new ol.style.Stroke({
+                  color: [0, 0, 0, 0.8],
+                }),
+              }),
+            ],
+          }),
+        ],
+        target: "map",
+        view: new ol.View({
+          center: ol.proj.fromLonLat([30.31, 50.27]),
+          zoom: 8,
+        }),
+      });
+    </script>
+  </body>
+</html>

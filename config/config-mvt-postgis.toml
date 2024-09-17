@@ -1,0 +1,48 @@
+[webserver]
+port = ":8081"
+
+[webserver.headers]
+Cache-Control = "s-maxage=3600"
+
+[cache]
+type = "redis"
+address = "${REDIS_HOST}"
+password = "${REDIS_PASSWORD}"
+ttl = 10
+max_zoom = 18
+ssl = "${TEGOLA_REDIS_SSL}"
+db = 1
+
+[[providers]]
+name = "world"
+type = "mvt_postgis"
+uri = "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${TEGOLA_POSTGIS_SSL}" # PostGIS connection string (required)
+srid = 4326             
+
+  [[providers.layers]]
+  name = "river"
+  geometry_fieldname = "wkb_geometry"
+  geometry_type="linestring"
+  id_fieldname = "sample_id"
+  sql = "SELECT ST_AsMVTGeom(wkb_geometry, !BBOX!) AS wkb_geometry, name, sample_id FROM rivers WHERE wkb_geometry && !BBOX!"
+
+  [[providers.layers]]
+  name = "city"
+  geometry_fieldname = "wkb_geometry"
+  geometry_type="polygon"
+  id_fieldname = "sample_id"
+  sql = "SELECT ST_AsMVTGeom(wkb_geometry, !BBOX!) AS wkb_geometry, name, sample_id FROM cities WHERE wkb_geometry && !BBOX!"
+
+[[maps]]
+name = "world"
+center = [30.31, 50.27, 8.0]
+
+  [[maps.layers]]
+  provider_layer = "world.river"
+  min_zoom = 5
+  max_zoom = 20
+
+  [[maps.layers]]
+  provider_layer = "world.city"
+  min_zoom = 5
+  max_zoom = 20
